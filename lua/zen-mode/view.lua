@@ -114,9 +114,10 @@ end
 function M.layout(opts)
   local width = M.resolve(vim.o.columns, opts.window.width)
   local height = M.resolve(M.height(), opts.window.height)
+  local shift_amount = opts.window.shift_amount or 0
 
   return {
-    width = M.round(width),
+    width = M.round(width) - math.abs(shift_amount*2),
     height = M.round(height),
     col = M.round((vim.o.columns - width) / 2),
     row = M.round((M.height() - height) / 2),
@@ -125,6 +126,7 @@ end
 
 -- adjusts col/row if window was resized
 function M.fix_layout(win_resized)
+  local shift_amount = M.opts.window.shift_amount or 0
   if M.is_open() then
     if win_resized then
       local l = M.layout(M.opts)
@@ -140,7 +142,7 @@ function M.fix_layout(win_resized)
     local wcol = type(cfg.col) == "number" and cfg.col or cfg.col[false]
     local wrow = type(cfg.row) == "number" and cfg.row or cfg.row[false]
     if wrow ~= row or wcol ~= col then
-      vim.api.nvim_win_set_config(M.win, { col = col, row = row, relative = "editor" })
+      vim.api.nvim_win_set_config(M.win, { col = col + shift_amount, row = row, relative = "editor" })
     end
   end
 end
