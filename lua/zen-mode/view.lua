@@ -12,6 +12,15 @@ M.opts = nil
 M.state = {}
 M.closed = false
 
+function M.shift(amount)
+  if M.opts == nil then
+    return
+  end
+  local previous_shift_amount = M.opts.window.shift_amount or 0
+  M.opts.window.shift_amount = previous_shift_amount + amount
+  M.fix_layout(true)
+end
+
 function M.is_open()
   return M.win and vim.api.nvim_win_is_valid(M.win)
 end
@@ -117,7 +126,7 @@ function M.layout(opts)
   local shift_amount = opts.window.shift_amount or 0
 
   return {
-    width = M.round(width) - math.abs(shift_amount*2),
+    width = M.round(width) - math.abs(shift_amount * 2),
     height = M.round(height),
     col = M.round((vim.o.columns - width) / 2),
     row = M.round((M.height() - height) / 2),
@@ -154,7 +163,7 @@ function M.create(opts)
   M.opts = opts
   M.state = {}
   M.parent = vim.api.nvim_get_current_win()
-  -- should apply before calculate window's height to be able handle 'laststatus' option  
+  -- should apply before calculate window's height to be able handle 'laststatus' option
   M.plugins_on_open()
 
   M.bg_buf = vim.api.nvim_create_buf(false, true)
